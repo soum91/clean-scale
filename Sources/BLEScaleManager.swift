@@ -11,8 +11,9 @@ struct ScaleReading: Identifiable {
     let id = UUID()
     let date: Date
     let weightKg: Double
+    let impedance: Double?   // ohms, when the scale reports it
     let stable: Bool
-    let source: String   // which characteristic / decoder produced this
+    let source: String       // which decoder produced this
 }
 
 final class BLEScaleManager: NSObject, ObservableObject {
@@ -28,6 +29,7 @@ final class BLEScaleManager: NSObject, ObservableObject {
     private var central: CBCentralManager!
     private var peripheral: CBPeripheral?
     private var seen = Set<UUID>()
+    private var recentWeights: [Double] = []   // for heuristic stability detection
 
     override init() {
         super.init()
@@ -43,8 +45,6 @@ final class BLEScaleManager: NSObject, ObservableObject {
         seen.removeAll()
         scanning = true
         status = "Scanning for scales..."
-        // Pass nil: many budget scales do not advertise the standard service,
-        // so we discover everything and let you pick, then log what it sends.
         central.scanForPeripherals(withServices: nil,
                                    options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
     }
@@ -59,6 +59,7 @@ final class BLEScaleManager: NSObject, ObservableObject {
         stopScan()
         peripheral = p
         p.delegate = self
+        recentWeights.removeAll()
         status = "Connecting to \(p.name ?? "device")..."
         central.connect(p, options: nil)
     }
@@ -77,36 +78,76 @@ final class BLEScaleManager: NSObject, ObservableObject {
 
     // MARK: - Decoders
 
+    private func u16(_ b: [UInt8], _ i: Int, bigEndian: Bool) -> Int {
+        bigEndian ? (Int(b[i]) << 8 | Int(b[i + 1])) : (Int(b[i]) | Int(b[i + 1]) << 8)
+    }
+
     // Standard SIG Weight Measurement (0x2A9D). Correct per Bluetooth spec.
     private func decodeStandardWeight(_ data: Data) -> ScaleReading? {
         let b = [UInt8](data)
         guard b.count >= 3 else { return nil }
         let flags = b[0]
         let imperial = (flags & 0x01) != 0
-        let raw = UInt16(b[1]) | (UInt16(b[2]) << 8)
+        let raw = u16(b, 1, bigEndian: false)
         let kg: Double = imperial
-            ? Double(raw) * 0.01 * 0.45359237   // lb -> kg
-            : Double(raw) * 0.005               // SI resolution
-        return ScaleReading(date: Date(), weightKg: kg, stable: true, source: "SIG 2A9D")
+            ? Double(raw) * 0.01 * 0.45359237
+            : Double(raw) * 0.005
+        return ScaleReading(date: Date(), weightKg: kg, impedance: nil, stable: true, source: "SIG 2A9D")
     }
 
-    // Plug your scale's custom format in here once we read its raw bytes.
-    // Many Lefu/OKOK scales notify a stream of frames where a stable reading
-    // is flagged in a status byte and weight is a big- or little-endian uint16
-    // at a fixed offset, scaled by 0.01 or 0.1. We confirm the exact layout
-    // from the rawLog, then fill this in. Returns nil until then.
-    private func decodeCustom(_ data: Data, char: CBUUID) -> ScaleReading? {
-        return nil
+    // Heuristic decoder for custom (non-standard) scales. We don't know the exact byte
+    // layout, so we hunt for a uint16 that reads as a plausible body weight and a second
+    // uint16 that reads as a plausible impedance, trying both byte orders and common
+    // scalings. A reading is marked "stable" once the weight holds steady across frames.
+    // This is best-effort; the raw log still captures every byte so the exact layout for
+    // a specific model can be locked in via decodeExact() once known.
+    private func decodeHeuristic(_ data: Data) -> ScaleReading? {
+        let b = [UInt8](data)
+        guard b.count >= 2 else { return nil }
+
+        // Find a weight candidate: first uint16 (either endian) that scales into human range.
+        let scales: [Double] = [0.01, 0.05, 0.1]
+        var weight: Double?
+        var wOffset = -1
+        search: for i in 0..<(b.count - 1) {
+            for be in [false, true] {
+                let raw = u16(b, i, bigEndian: be)
+                for s in scales {
+                    let v = Double(raw) * s
+                    if v >= 3 && v <= 300 { weight = v; wOffset = i; break search }
+                }
+            }
+        }
+        guard let w = weight else { return nil }
+
+        // Find an impedance candidate: a uint16 in a plausible ohm range, away from the
+        // weight bytes.
+        var imp: Double?
+        for i in 0..<(b.count - 1) where i < wOffset - 1 || i > wOffset + 1 {
+            for be in [false, true] {
+                let raw = u16(b, i, bigEndian: be)
+                if raw >= 150 && raw <= 1000 { imp = Double(raw); break }
+            }
+            if imp != nil { break }
+        }
+
+        // Stability: weight steady (within 0.15 kg) across the last 3 frames.
+        recentWeights.append(w)
+        if recentWeights.count > 4 { recentWeights.removeFirst() }
+        let last3 = recentWeights.suffix(3)
+        let stable = last3.count == 3 && (last3.max()! - last3.min()! <= 0.15)
+
+        return ScaleReading(date: Date(), weightKg: w, impedance: imp, stable: stable, source: "heuristic")
     }
 
     private func handle(_ data: Data, char: CBUUID) {
         let hex = data.map { String(format: "%02X", $0) }.joined(separator: " ")
         log("\(char.uuidString): \(hex)")
 
-        if let r = decodeStandardWeight(data), char == weightMeasurementCharUUID {
+        if char == weightMeasurementCharUUID, let r = decodeStandardWeight(data) {
             publish(r); return
         }
-        if let r = decodeCustom(data, char: char) {
+        if let r = decodeHeuristic(data) {
             publish(r); return
         }
     }
@@ -114,7 +155,12 @@ final class BLEScaleManager: NSObject, ObservableObject {
     private func publish(_ r: ScaleReading) {
         DispatchQueue.main.async {
             self.latest = r
-            if r.stable { self.history.insert(r, at: 0) }
+            if r.stable {
+                // Replace a prior unstable tail entry or append the stabilized reading.
+                self.history.insert(r, at: 0)
+                if self.history.count > 50 { self.history.removeLast() }
+            }
+            self.status = r.stable ? "Stable reading" : "Reading..."
         }
     }
 }
@@ -123,20 +169,19 @@ extension BLEScaleManager: CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ c: CBCentralManager) {
         bluetoothReady = c.state == .poweredOn
         switch c.state {
-        case .poweredOn:   status = "Ready"
-        case .poweredOff:  status = "Bluetooth is off"
+        case .poweredOn:    status = "Ready"
+        case .poweredOff:   status = "Bluetooth is off"
         case .unauthorized: status = "Bluetooth permission denied"
-        default:           status = "Bluetooth unavailable"
+        default:            status = "Bluetooth unavailable"
         }
     }
 
     func centralManager(_ c: CBCentralManager, didDiscover p: CBPeripheral,
                         advertisementData: [String: Any], rssi RSSI: NSNumber) {
-        guard let name = p.name, !name.isEmpty else { return }  // skip unnamed noise
+        guard let name = p.name, !name.isEmpty else { return }
         if !seen.contains(p.identifier) {
             seen.insert(p.identifier)
             DispatchQueue.main.async { self.discovered.append(p) }
-            // Log any manufacturer/service data: some scales ship weight in the advert itself.
             if let mfg = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data {
                 let hex = mfg.map { String(format: "%02X", $0) }.joined(separator: " ")
                 log("ADV \(name) mfgData: \(hex)")
