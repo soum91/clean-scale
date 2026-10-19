@@ -66,3 +66,14 @@ jobs:
           name: CleanScale-unsigned-ipa
           path: dist/CleanScale-unsigned.ipa
           if-no-files-found: error
+
+      - name: Publish IPA to dist branch (readable via API)
+        if: success()
+        run: |
+          git config user.name "ci"
+          git config user.email "ci@users.noreply.github.com"
+          git checkout -B dist
+          cp "$GITHUB_WORKSPACE/dist/CleanScale-unsigned.ipa" CleanScale-unsigned.ipa
+          git add -f CleanScale-unsigned.ipa
+          git commit -m "IPA for ${GITHUB_SHA}" || true
+          git push -f origin dist
