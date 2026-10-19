@@ -1,0 +1,52 @@
+name: Build unsigned IPA
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build archive (unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project CleanScale.xcodeproj \
+            -scheme CleanScale \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/CleanScale.xcarchive" \
+            archive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM=""
+
+      - name: Package into unsigned .ipa
+        run: |
+          APP_DIR="$RUNNER_TEMP/CleanScale.xcarchive/Products/Applications"
+          cd "$APP_DIR"
+          mkdir -p Payload
+          cp -R CleanScale.app Payload/
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          zip -qr "$GITHUB_WORKSPACE/dist/CleanScale-unsigned.ipa" Payload
+          ls -lh "$GITHUB_WORKSPACE/dist"
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CleanScale-unsigned-ipa
+          path: dist/CleanScale-unsigned.ipa
+          if-no-files-found: error
