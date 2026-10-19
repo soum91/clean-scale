@@ -2,6 +2,7 @@ name: Build unsigned IPA
 
 on:
   push:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -32,7 +33,19 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGN_ENTITLEMENTS="" \
-            DEVELOPMENT_TEAM=""
+            DEVELOPMENT_TEAM="" \
+            2>&1 | tee "$GITHUB_WORKSPACE/build.log"
+
+      - name: Publish build log (so it can be read via API)
+        if: always()
+        run: |
+          git config user.name "ci"
+          git config user.email "ci@users.noreply.github.com"
+          git checkout -B ci-logs
+          tail -n 400 "$GITHUB_WORKSPACE/build.log" > ci-build.log || echo "no build.log produced" > ci-build.log
+          git add -f ci-build.log
+          git commit -m "CI build log for ${GITHUB_SHA}" || true
+          git push -f origin ci-logs
 
       - name: Package into unsigned .ipa
         run: |
