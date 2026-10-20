@@ -20,6 +20,15 @@
       "screenshotURLs": [],
       "versions": [
         {
+          "version": "1.0.10",
+          "buildVersion": "10",
+          "date": "2026-10-20T20:20:34Z",
+          "localizedDescription": "- CI: version string carries the build number (<version>.<build>) (72718c1)",
+          "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-10/CleanScale-1.0-build-10.ipa",
+          "size": 99491,
+          "minOSVersion": "16.0"
+        },
+        {
           "version": "1.0",
           "buildVersion": "9",
           "date": "2026-10-20T18:50:39Z",
@@ -38,11 +47,11 @@
           "minOSVersion": "16.0"
         }
       ],
-      "version": "1.0",
-      "versionDate": "2026-10-20T18:50:39Z",
-      "versionDescription": "- CI: publish an AltStore-format source for FlareStore / AltStore / SideStore (4356e1f)",
-      "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-9/CleanScale-1.0-build-9.ipa",
-      "size": 99492,
+      "version": "1.0.10",
+      "versionDate": "2026-10-20T20:20:34Z",
+      "versionDescription": "- CI: version string carries the build number (<version>.<build>) (72718c1)",
+      "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-10/CleanScale-1.0-build-10.ipa",
+      "size": 99491,
       "appPermissions": {}
     }
   ],
