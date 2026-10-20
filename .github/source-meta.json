@@ -1,0 +1,13 @@
+{
+  "name": "CleanScale",
+  "sourceName": "CleanScale by soum91",
+  "sourceIdentifier": "io.github.soum91.clean-scale",
+  "subtitle": "Ad-free smart scale app",
+  "description": "Ad-free replacement for the OKOK app: reads OKOK/Lefu Bluetooth body-composition scales directly, no account, no ads.",
+  "developerName": "soum91",
+  "iconURL": "https://raw.githubusercontent.com/soum91/clean-scale/main/Sources/Assets.xcassets/AppIcon.appiconset/icon_1024.png",
+  "tintColor": "34C759",
+  "category": "health-and-fitness",
+  "website": "https://github.com/soum91/clean-scale",
+  "sourceURL": "https://raw.githubusercontent.com/soum91/clean-scale/source/source.json"
+}
