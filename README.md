@@ -10,8 +10,9 @@ Every push builds an **unsigned IPA** on GitHub's macOS runners and uploads it
 as a downloadable artifact. You never open Xcode.
 
 - Push to this repo (or hit **Actions → Build unsigned IPA → Run workflow**).
-- When the run finishes, open it and download the **CleanScale-unsigned-ipa**
-  artifact at the bottom. Inside is `CleanScale-unsigned.ipa`.
+- When the run finishes, grab `CleanScale-<version>-build-<N>.ipa` from the
+  [latest release](../../releases/latest). Each release lists what changed since
+  the previous build, and the build number is stamped into the app (CFBundleVersion).
 
 ## Installing the IPA
 
