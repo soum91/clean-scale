@@ -67,6 +67,8 @@ jobs:
           cp -R CleanScale.app Payload/
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD" Payload/CleanScale.app/Info.plist
           VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" Payload/CleanScale.app/Info.plist)
+          # Sideloaders (FlareStore etc.) only compare the version string, so make it <version>.<build>.
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION.$BUILD" Payload/CleanScale.app/Info.plist
           IPA="$APP-$VERSION-build-$BUILD.ipa"
           mkdir -p "$GITHUB_WORKSPACE/dist"
           zip -qr "$GITHUB_WORKSPACE/dist/$IPA" Payload
