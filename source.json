@@ -21,6 +21,15 @@
       "versions": [
         {
           "version": "1.0",
+          "buildVersion": "9",
+          "date": "2026-10-20T18:50:39Z",
+          "localizedDescription": "- CI: publish an AltStore-format source for FlareStore / AltStore / SideStore (4356e1f)",
+          "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-9/CleanScale-1.0-build-9.ipa",
+          "size": 99492,
+          "minOSVersion": "16.0"
+        },
+        {
+          "version": "1.0",
           "buildVersion": "8",
           "date": "2026-10-20T18:47:37Z",
           "localizedDescription": "- CI: build number in IPA file names and changelog in release notes (37647a2)\n- Redesign UI as an instrument panel and add an app icon (41c2ddc)\n- Add body-composition engine, impedance decoding, and profile input (2a1c08e)\n- CI: publish built IPA to dist branch for in-chat delivery (b0bce3c)\n- CI: build on macos-15 (Xcode 16) to read XcodeGen's project format (b4bb7b6)\n- CI: grant contents:write so build log can publish (d334964)\n- CI: publish build log to ci-logs branch for diagnosis (31a30a3)\n- Clean Scale: no-ad BLE scale app with CI-built unsigned IPA (2f55018)",
@@ -30,9 +39,9 @@
         }
       ],
       "version": "1.0",
-      "versionDate": "2026-10-20T18:47:37Z",
-      "versionDescription": "- CI: build number in IPA file names and changelog in release notes (37647a2)\n- Redesign UI as an instrument panel and add an app icon (41c2ddc)\n- Add body-composition engine, impedance decoding, and profile input (2a1c08e)\n- CI: publish built IPA to dist branch for in-chat delivery (b0bce3c)\n- CI: build on macos-15 (Xcode 16) to read XcodeGen's project format (b4bb7b6)\n- CI: grant contents:write so build log can publish (d334964)\n- CI: publish build log to ci-logs branch for diagnosis (31a30a3)\n- Clean Scale: no-ad BLE scale app with CI-built unsigned IPA (2f55018)",
-      "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-8/CleanScale-1.0-build-8.ipa",
+      "versionDate": "2026-10-20T18:50:39Z",
+      "versionDescription": "- CI: publish an AltStore-format source for FlareStore / AltStore / SideStore (4356e1f)",
+      "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-9/CleanScale-1.0-build-9.ipa",
       "size": 99492,
       "appPermissions": {}
     }
