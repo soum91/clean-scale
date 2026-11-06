@@ -20,6 +20,15 @@
       "screenshotURLs": [],
       "versions": [
         {
+          "version": "1.0.11",
+          "buildVersion": "11",
+          "date": "2026-11-06T20:15:03Z",
+          "localizedDescription": "- Show actual installed app version and build in UI (0a76a45)",
+          "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-11/CleanScale-1.0-build-11.ipa",
+          "size": 100629,
+          "minOSVersion": "16.0"
+        },
+        {
           "version": "1.0.10",
           "buildVersion": "10",
           "date": "2026-10-20T20:20:34Z",
@@ -47,11 +56,11 @@
           "minOSVersion": "16.0"
         }
       ],
-      "version": "1.0.10",
-      "versionDate": "2026-10-20T20:20:34Z",
-      "versionDescription": "- CI: version string carries the build number (<version>.<build>) (72718c1)",
-      "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-10/CleanScale-1.0-build-10.ipa",
-      "size": 99491,
+      "version": "1.0.11",
+      "versionDate": "2026-11-06T20:15:03Z",
+      "versionDescription": "- Show actual installed app version and build in UI (0a76a45)",
+      "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-11/CleanScale-1.0-build-11.ipa",
+      "size": 100629,
       "appPermissions": {}
     }
   ],
