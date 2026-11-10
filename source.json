@@ -20,6 +20,15 @@
       "screenshotURLs": [],
       "versions": [
         {
+          "version": "1.0.13",
+          "buildVersion": "13",
+          "date": "2026-11-10T08:04:02Z",
+          "localizedDescription": "- Enforce pseudonymous author metadata and owner privacy (91fc29a)\n- docs: enforce verified diagnostic export contract [skip ci] (37f7bfc)\n- docs: enforce verified diagnostic export contract [skip ci] (0d4c51b)\n- docs: require verified diagnostics Copy, Share and Files export [skip ci] (7d16102)\n- docs: require verified diagnostics Copy, Share and Files export [skip ci] (deec00f)\n- ci: separate release tracks when deriving factual changes [skip ci] (905073d)\n- ci: reconcile bot-created releases with factual notes [skip ci] (fea9992)\n- ci: verify and record actual release changes [skip ci] (d09e2a6)\n- docs: require evidence-based release changelog [skip ci] (d4b80e3)\n- docs: initialize factual release changelog [skip ci] (656929c)",
+          "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-13/CleanScale-1.0-build-13.ipa",
+          "size": 100629,
+          "minOSVersion": "16.0"
+        },
+        {
           "version": "1.0.12",
           "buildVersion": "12",
           "date": "2026-11-06T20:38:14Z",
@@ -65,11 +74,11 @@
           "minOSVersion": "16.0"
         }
       ],
-      "version": "1.0.12",
-      "versionDate": "2026-11-06T20:38:14Z",
-      "versionDescription": "- Enforce visible installed version/build across app releases (3766f8c)",
-      "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-12/CleanScale-1.0-build-12.ipa",
-      "size": 100630,
+      "version": "1.0.13",
+      "versionDate": "2026-11-10T08:04:02Z",
+      "versionDescription": "- Enforce pseudonymous author metadata and owner privacy (91fc29a)\n- docs: enforce verified diagnostic export contract [skip ci] (37f7bfc)\n- docs: enforce verified diagnostic export contract [skip ci] (0d4c51b)\n- docs: require verified diagnostics Copy, Share and Files export [skip ci] (7d16102)\n- docs: require verified diagnostics Copy, Share and Files export [skip ci] (deec00f)\n- ci: separate release tracks when deriving factual changes [skip ci] (905073d)\n- ci: reconcile bot-created releases with factual notes [skip ci] (fea9992)\n- ci: verify and record actual release changes [skip ci] (d09e2a6)\n- docs: require evidence-based release changelog [skip ci] (d4b80e3)\n- docs: initialize factual release changelog [skip ci] (656929c)",
+      "downloadURL": "https://github.com/soum91/clean-scale/releases/download/build-13/CleanScale-1.0-build-13.ipa",
+      "size": 100629,
       "appPermissions": {}
     }
   ],
